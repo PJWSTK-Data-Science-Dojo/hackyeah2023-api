@@ -12,11 +12,11 @@ public class SqlQueryExecutor
         ArgumentException.ThrowIfNullOrEmpty(_connectionString,nameof(_connectionString));
     }
 
-    public async Task<(List<Dictionary<string, object>> result, string errorMessage)> ExecuteQueryAsync(string sqlQuery)
+    public async Task<(List<Dictionary<string, object>> result, string errorMessage)> ExecuteQueryAsync(string sqlQuery, string? connectionString = null)
     {
         try
         {
-            await using var connection = new SqliteConnection(_connectionString);
+            await using var connection = new SqliteConnection(connectionString  ?? _connectionString);
             await connection.OpenAsync();
 
             await using var command = connection.CreateCommand();
