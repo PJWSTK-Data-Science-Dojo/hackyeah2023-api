@@ -4,12 +4,14 @@ namespace HackYeah_API.Services;
 
 public class SqlQueryExecutor
 {
+    public string DatabaseName { get; set; }
     private string _connectionString;
 
     public SqlQueryExecutor(IConfiguration config)
     {
         _connectionString = config.GetConnectionString("SQLitePath");
         ArgumentException.ThrowIfNullOrEmpty(_connectionString,nameof(_connectionString));
+        DatabaseName = _connectionString.Split('\\').Last();
     }
 
     public void UpdateConnectionString(string newestConnectionString)

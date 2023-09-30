@@ -26,6 +26,6 @@ public class AdminController : ControllerBase
         var ddl = await _ddlExtractionService.ExtractDdl(fileUpload.File);
         await _mlService.SendDDL(ddl);
 
-        return Ok("File uploaded successfully");
+        return Ok(new {data = ddl});
     }
 }

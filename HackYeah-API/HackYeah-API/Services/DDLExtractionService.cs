@@ -10,6 +10,7 @@ public class DdlExtractionService : IDdlExtractionService
     private string _databasesPath;
     private readonly SqlQueryExecutor _queryExecutor;
     private readonly SQLQueries _sqlQueries;
+
     public DdlExtractionService(IConfiguration config, IMLService mlService, SqlQueryExecutor queryExecutor, SQLQueries sqlQueries)
     {
         _databasesPath = config.GetValue<string>("StoragePath");
@@ -52,7 +53,9 @@ public class DdlExtractionService : IDdlExtractionService
 
     private async Task<string> SaveFile(IFormFile sqlLiteFile)
     {
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), _databasesPath, sqlLiteFile.FileName);
+        _queryExecutor.DatabaseName = sqlLiteFile.FileName;
+        var newFilename = Path.GetRandomFileName();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), _databasesPath, newFilename);
         Directory.CreateDirectory(Path.GetDirectoryName(filePath));
         await using var fileStream = new FileStream(filePath, FileMode.Create);
         await sqlLiteFile.CopyToAsync(fileStream);

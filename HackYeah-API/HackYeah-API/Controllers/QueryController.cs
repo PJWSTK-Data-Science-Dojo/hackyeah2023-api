@@ -33,4 +33,10 @@ public class QueryController : ControllerBase
 
         return BadRequest(new {error = queryResult.errorMessage});
     }
+
+    [HttpGet("/dbName")]
+    public async Task<IActionResult> GetCurrentDbName()
+    {
+        return Ok(new {data = _sqlQueryExecutor.DatabaseName});
+    }
 }
