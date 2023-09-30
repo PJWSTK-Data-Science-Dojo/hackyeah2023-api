@@ -12,7 +12,7 @@ RUN dotnet build "HackYeah-API.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "HackYeah-API.csproj" -c Release -o /app/publish
 COPY ./hackathon.db /app/publish/hackathon.db
-COPY ./Databases/Queries /app/Databases/Queries
+COPY ./HackYeah-API/Databases/Queries /app/publish/Databases/Queries
 
 FROM base AS final
 WORKDIR /app
