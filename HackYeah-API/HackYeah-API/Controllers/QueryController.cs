@@ -21,7 +21,7 @@ public class QueryController : ControllerBase
     public async Task<IActionResult> PromptForSqlQuery([FromBody] UserNlpInputDto userNlpInput)
     {
         var sqlQuery = await _mlService.RequestForSQLPrompt(userNlpInput.NaturalLanguageInput);
-        return Ok(sqlQuery);
+        return Ok(new {sql = sqlQuery});
     }
 
     [HttpPost("/execute")]
@@ -29,8 +29,8 @@ public class QueryController : ControllerBase
     {
         var queryResult = await _sqlQueryExecutor.ExecuteQueryAsync(userSqlInput.SqlQuery);
         if (queryResult.errorMessage.IsNullOrEmpty())
-            return Ok(queryResult.result);
+            return Ok(new {data = queryResult.result});
 
-        return BadRequest(queryResult.errorMessage);
+        return BadRequest(new {error = queryResult.errorMessage});
     }
 }
