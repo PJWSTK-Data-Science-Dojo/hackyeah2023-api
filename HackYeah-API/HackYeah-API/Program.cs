@@ -1,7 +1,6 @@
-using HackYeah_API.Database;
 using HackYeah_API.Services;
+using HackYeah_API.Services.Interfaces;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,13 +8,10 @@ var configuration = builder.Configuration;
 
 builder.Host.UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration));
 
-//builder.Services.AddDbContext<DatabaseContext>(options =>
-    //options.UseSqlServer(configuration.GetConnectionString("QueryDatabase")));  // Use UseSqlite for SQLite
-builder.Services.AddDbContext<DatabaseContext>(options => 
-    options.UseSqlite(configuration.GetConnectionString("SQLitePath")));
 builder.Services.AddScoped<SqlQueryExecutor>();
 builder.Services.AddControllers();
-
+builder.Services.AddSingleton<IDdlExtractionService, DdlExtractionService>();
+builder.Services.AddSingleton<IMLService, MLService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

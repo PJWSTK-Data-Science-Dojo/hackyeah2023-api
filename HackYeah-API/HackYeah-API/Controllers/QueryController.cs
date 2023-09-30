@@ -1,4 +1,5 @@
 ﻿using HackYeah_API.Services;
+using HackYeah_API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -7,21 +8,17 @@ using Microsoft.IdentityModel.Tokens;
 public class QueryController : ControllerBase
 {
     private readonly SqlQueryExecutor _sqlQueryExecutor;
-
-    public QueryController(SqlQueryExecutor sqlQueryExecutor)
+    private readonly IMLService _mlService;
+    public QueryController(SqlQueryExecutor sqlQueryExecutor, IMLService mlService)
     {
         _sqlQueryExecutor = sqlQueryExecutor;
+        _mlService = mlService;
     }
 
     [HttpPost]
     public async Task<IActionResult> GenerateSql([FromBody] UserInputDto userInput)
     {
-        //todo add python api integration
-        // ... logic to interact with the external Python-based API
-        // Assume sqlQuery is the SQL query string received from the external API
-
-        var sqlQuery = "SELECT * FROM VAT_SPRZEDAZ;";
-
+        var sqlQuery = await _mlService.RequestForSQLPrompt(userInput.NaturalLanguageInput);
         var queryResult = await _sqlQueryExecutor.ExecuteQueryAsync(sqlQuery);
         if(queryResult.errorMessage.IsNullOrEmpty())
             return Ok(queryResult.result);
