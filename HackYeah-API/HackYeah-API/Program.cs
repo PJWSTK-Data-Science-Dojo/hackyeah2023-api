@@ -14,6 +14,7 @@ builder.Services.AddSingleton<IDdlExtractionService, DdlExtractionService>();
 builder.Services.AddSingleton<IMLService, MLService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -41,13 +42,6 @@ else
             await context.Response.WriteAsync("An unexpected error occurred. Please try again later.");
         });
     });
-}
-
-if (configuration.GetSection("Kestrel").Exists())
-{
-    var urls = configuration.GetSection("Kestrel:EndPoints:Http:Url").Value;
-    app.Urls.Clear();
-    app.Urls.Add(urls);
 }
 
 app.UseHttpsRedirection();
