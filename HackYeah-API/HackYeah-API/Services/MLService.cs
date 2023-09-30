@@ -22,7 +22,6 @@ public class MLService : IMLService
 
     public Task<string> RequestForSQLPrompt(string naturalLanguagePrompt)
     {
-        
         //todo implement
         return Task.Run(()=> "Select 1");
     }
