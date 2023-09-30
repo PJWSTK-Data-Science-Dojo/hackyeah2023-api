@@ -26,8 +26,6 @@ public class DdlExtractionService : IDdlExtractionService
                         m.name AS table_name,
                         p.name AS column_name,
                         p.[type] AS data_type,
-                        p.[notnull] AS not_null,
-                        p.[dflt_value] AS default_value,
                         f.[table] AS referenced_table,
                         f.[to] AS referenced_column
                     FROM
