@@ -10,6 +10,7 @@ builder.Host.UseSerilog((context, config) => config.ReadFrom.Configuration(conte
 builder.Services.AddControllers();
 
 builder.Services.AddSingleton<SqlQueryExecutor>();
+builder.Services.AddSingleton<SQLQueries>();
 builder.Services.AddSingleton<IDdlExtractionService, DdlExtractionService>();
 builder.Services.AddSingleton<IMLService, MLService>();
 builder.Services.AddEndpointsApiExplorer();
