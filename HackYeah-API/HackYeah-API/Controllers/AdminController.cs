@@ -1,5 +1,4 @@
 ﻿using HackYeah_API.Models;
-using HackYeah_API.Services;
 using HackYeah_API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,9 +22,15 @@ public class AdminController : ControllerBase
         if (fileUpload.File == null || fileUpload.File.Length == 0)
             return BadRequest("No file uploaded.");
 
-        var ddl = await _ddlExtractionService.ExtractDdl(fileUpload.File);
-        await _mlService.SendDDL(ddl);
-
-        return Ok(new {data = ddl});
+        try
+        {
+            var ddl = await _ddlExtractionService.ExtractDdl(fileUpload.File);
+            await _mlService.SendDDL(ddl);
+            return Ok(new { data = ddl });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new {error = e.Message});
+        }
     }
 }
