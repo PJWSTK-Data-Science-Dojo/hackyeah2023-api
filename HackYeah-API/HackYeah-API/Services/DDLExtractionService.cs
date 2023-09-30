@@ -1,5 +1,6 @@
 ﻿using HackYeah_API.Services.Interfaces;
 using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HackYeah_API.Services;
 
@@ -7,7 +8,7 @@ public class DdlExtractionService : IDdlExtractionService
 {
     private readonly IMLService _mlService;
     private string _databasesPath;
-    private SqlQueryExecutor _queryExecutor;
+    private readonly SqlQueryExecutor _queryExecutor;
     public DdlExtractionService(IConfiguration config, IMLService mlService, SqlQueryExecutor queryExecutor)
     {
         _databasesPath = config.GetValue<string>("StoragePath");
@@ -42,28 +43,30 @@ public class DdlExtractionService : IDdlExtractionService
                     ORDER BY
                         m.name, p.cid;
                 ";
+
         var result = await _queryExecutor.ExecuteQueryAsync(sql);
 
-        if ( result.errorMessage is not null )
+        if (!result.errorMessage.IsNullOrEmpty())
         {
             return result.errorMessage;
         } 
-        else
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (var dict in result.result)
-            {
-                foreach (var kvp in dict)
-                {
-                    stringBuilder.Append($"{kvp.Key}: {kvp.Value}\n");
-                }
-                stringBuilder.Append("\n"); // Add a separator between dictionaries
-            }
 
-            await _mlService.SendDDL(stringBuilder.ToString());
+        StringBuilder stringBuilder = new StringBuilder();
+        foreach (var dict in result.result)
+        {
+            foreach (var kvp in dict)
+            {
+                if(kvp.Key=="not_null" || kvp.Key == "default_value")
+                    continue;
+
+                stringBuilder.Append($"{kvp.Key}: {kvp.Value}\n");
+            }
+            stringBuilder.Append("\n"); 
         }
-        
-        return await Task.Run(() => "null");
+
+        string stringifyResult = stringBuilder.ToString();
+        await _mlService.SendDDL(stringifyResult);
+        return await Task.Run(() => stringifyResult);
     }
 
     private async Task<string> SaveFile(IFormFile sqlLiteFile)
@@ -72,6 +75,7 @@ public class DdlExtractionService : IDdlExtractionService
         Directory.CreateDirectory(Path.GetDirectoryName(filePath));
         await using var fileStream = new FileStream(filePath, FileMode.Create);
         await sqlLiteFile.CopyToAsync(fileStream);
+        _queryExecutor.UpdateConnectionString(filePath);
         return filePath;
     }
 }

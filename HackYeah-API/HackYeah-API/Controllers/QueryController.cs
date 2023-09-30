@@ -1,6 +1,8 @@
-﻿using HackYeah_API.Services;
+﻿using HackYeah_API.Models;
+using HackYeah_API.Services;
 using HackYeah_API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 
 [ApiController]
@@ -15,12 +17,18 @@ public class QueryController : ControllerBase
         _mlService = mlService;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> GenerateSql([FromBody] UserInputDto userInput)
+    [HttpPost("/prompt")]
+    public async Task<IActionResult> PromptForSqlQuery([FromBody] UserNlpInputDto userNlpInput)
     {
-        var sqlQuery = await _mlService.RequestForSQLPrompt(userInput.NaturalLanguageInput);
-        var queryResult = await _sqlQueryExecutor.ExecuteQueryAsync(sqlQuery);
-        if(queryResult.errorMessage.IsNullOrEmpty())
+        var sqlQuery = await _mlService.RequestForSQLPrompt(userNlpInput.NaturalLanguageInput);
+        return Ok(sqlQuery);
+    }
+
+    [HttpPost("/execute")]
+    public async Task<IActionResult> ExecuteSql([FromBody] UserSqlInputDto userSqlInput)
+    {
+        var queryResult = await _sqlQueryExecutor.ExecuteQueryAsync(userSqlInput.SqlQuery);
+        if (queryResult.errorMessage.IsNullOrEmpty())
             return Ok(queryResult.result);
 
         return BadRequest(queryResult.errorMessage);

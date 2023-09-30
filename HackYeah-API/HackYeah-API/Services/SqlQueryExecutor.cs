@@ -4,12 +4,17 @@ namespace HackYeah_API.Services;
 
 public class SqlQueryExecutor
 {
-    private readonly string _connectionString;
+    private string _connectionString;
 
     public SqlQueryExecutor(IConfiguration config)
     {
         _connectionString = config.GetConnectionString("SQLitePath");
         ArgumentException.ThrowIfNullOrEmpty(_connectionString,nameof(_connectionString));
+    }
+
+    public void UpdateConnectionString(string newestConnectionString)
+    {
+        _connectionString = $"Data Source={newestConnectionString}";
     }
 
     public async Task<(List<Dictionary<string, object>> result, string errorMessage)> ExecuteQueryAsync(string sqlQuery, string? connectionString = null)

@@ -17,12 +17,13 @@ public class MLService : IMLService
     public Task SendDDL(string ddl)
     {
         //todo implement
-        return null;
+        return Task.Run(() => { });
     }
 
     public Task<string> RequestForSQLPrompt(string naturalLanguagePrompt)
     {
+        
         //todo implement
-        return Task.Run(()=>"SELECT * FROM VAT_SPRZEDAZ;");
+        return Task.Run(()=> "Select 1");
     }
 }

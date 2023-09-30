@@ -7,9 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 builder.Host.UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration));
-
-builder.Services.AddScoped<SqlQueryExecutor>();
 builder.Services.AddControllers();
+
+builder.Services.AddSingleton<SqlQueryExecutor>();
 builder.Services.AddSingleton<IDdlExtractionService, DdlExtractionService>();
 builder.Services.AddSingleton<IMLService, MLService>();
 builder.Services.AddEndpointsApiExplorer();
