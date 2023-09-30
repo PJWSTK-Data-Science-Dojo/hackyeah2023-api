@@ -54,7 +54,7 @@ public class DdlExtractionService : IDdlExtractionService
         {
             foreach (var kvp in dict)
             {
-                if(kvp.Key=="not_null" || kvp.Key == "default_value")
+                if(kvp.Value.ToString().IsNullOrEmpty())
                     continue;
 
                 stringBuilder.Append($"{kvp.Key}: {kvp.Value}\n");
