@@ -32,20 +32,30 @@ public class DdlExtractionService : IDdlExtractionService
         if (!result.errorMessage.IsNullOrEmpty())
         {
             return result.errorMessage;
-        } 
+        }
 
-        StringBuilder stringBuilder = new StringBuilder();
+        Dictionary<string, List<string>> tableColumns = new Dictionary<string, List<string>>();
+
         foreach (var dict in result.result)
         {
-            foreach (var kvp in dict)
+            string tableName = dict["table_name"]?.ToString();
+            string columnName = dict["column_name"]?.ToString();
+
+            if (string.IsNullOrEmpty(tableName) || string.IsNullOrEmpty(columnName))
+                continue;
+
+            if (!tableColumns.ContainsKey(tableName))
             {
-                if(kvp.Value.ToString().IsNullOrEmpty())
-                    continue;
-
-                stringBuilder.Append($"{kvp.Key}: [{string.Join(", ", kvp.Value)}]\n");
-
+                tableColumns[tableName] = new List<string>();
             }
-            stringBuilder.Append("\n"); 
+
+            tableColumns[tableName].Add(columnName);
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        foreach (var kvp in tableColumns)
+        {
+            stringBuilder.Append($"{kvp.Key}: {string.Join(", ", kvp.Value)}\n");
         }
 
         string stringifyResult = stringBuilder.ToString();
