@@ -1,5 +1,4 @@
-﻿using System;
-namespace HackYeah_API.Services;
+﻿namespace HackYeah_API.Databases;
 
 public class SQLQueries
 {

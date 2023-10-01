@@ -2,8 +2,9 @@
 using HackYeah_API.Services;
 using HackYeah_API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
+
+namespace HackYeah_API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
