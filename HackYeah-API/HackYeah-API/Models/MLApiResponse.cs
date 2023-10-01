@@ -2,5 +2,5 @@
 
 public class MLApiResponse
 {
-    public string Output { get; set; }
+    public string output { get; set; }
 }

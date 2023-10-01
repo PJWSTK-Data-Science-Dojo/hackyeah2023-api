@@ -37,17 +37,18 @@ public class MLService : IMLService
     public async Task<string> RequestForSQLPrompt(UserNlpInputDto naturalLanguagePrompt)
     {
         var client = _httpClientFactory.CreateClient();
-
+        client.Timeout = TimeSpan.FromMinutes(5);
         var payload = new
         {
-            query = naturalLanguagePrompt,
+            query = naturalLanguagePrompt.NaturalLanguageInput,
             hash = _contextGuid
         };
 
-        var jsonContent = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+        var payloadJson = JsonConvert.SerializeObject(payload);
+        var jsonContent = new StringContent(payloadJson, Encoding.UTF8, "application/json");
         string endpoint = naturalLanguagePrompt.IsPremiumModel ? _premiumQueryEndpoint : _queryEndpoint;
         var request = await client.PostAsync($"http://{APIUrl}{endpoint}", jsonContent);
         var response = await request.Content.ReadFromJsonAsync<MLApiResponse>();
-        return response?.Output ?? "ERROR";
+        return response?.output ?? "ERROR";
     }
 }

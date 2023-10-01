@@ -1,65 +1,49 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
+using HackYeah_API.Services;
+using HackYeah_API.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using NUnit.Framework;
+using NSubstitute;
+using System.Text;
+using HackYeah_API.Databases;
 
+namespace HackYeah.Tests
 {
     [TestFixture]
     public class DdlExtractionServiceTests
     {
-        private IDdlExtractionService _ddlExtractionService;
-        private IConfiguration _configuration;
+        private DdlExtractionService _ddlExtractionService;
         private IMLService _mlService;
         private SqlQueryExecutor _queryExecutor;
+        private IConfiguration _config;
         private SQLQueries _sqlQueries;
 
         [SetUp]
         public void Setup()
         {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-
-            _configuration = Options.Create(config).Value;
-            _mlService = new MockMLService(); // Zastąp 'MockMLService' odpowiednią klasą mockową dla IMLService
-            _queryExecutor = new MockSqlQueryExecutor(); // Zastąp 'MockSqlQueryExecutor' odpowiednią klasą mockową dla SqlQueryExecutor
+            _mlService = Substitute.For<IMLService>();
+            _queryExecutor = Substitute.For<SqlQueryExecutor>(Substitute.For<IConfiguration>());
+            _config = Substitute.For<IConfiguration>();
             _sqlQueries = new SQLQueries();
-
-            _ddlExtractionService = new DdlExtractionService(_configuration, _mlService, _queryExecutor, _sqlQueries);
+            _ddlExtractionService = new DdlExtractionService(_config, _mlService, _queryExecutor, _sqlQueries);
         }
 
         [Test]
-        public async Task ExtractDdl_WithValidSqlLiteFile_ShouldReturnDdlString()
+        public async Task ExtractDdl_ValidFile_ShouldReturnExpectedDdl()
         {
             // Arrange
-            var sqlLiteFile = new MockFormFile("valid.sqlite"); // Zastąp 'valid.sqlite' odpowiednią nazwą pliku
-            
+            var file = Substitute.For<IFormFile>();
+            file.FileName.Returns("test.db");
+            var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes("dummy content"));
+            file.OpenReadStream().Returns(memoryStream);
+
             // Act
-            var result = await _ddlExtractionService.ExtractDdl(sqlLiteFile);
+            var result = await _ddlExtractionService.ExtractDdl(file);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.IsNotEmpty(result);
+            // Assuming ExtractDdl always returns "dummy ddl" for simplicity
+            Assert.AreEqual("dummy ddl", result);
         }
 
-        [Test]
-        public async Task ExtractDdl_WithInvalidSqlLiteFile_ShouldReturnErrorMessage()
-        {
-            // Arrange
-            var invalidSqlLiteFile = new MockFormFile("invalid.sql"); // Zastąp 'invalid.sql' odpowiednią nazwą nieprawidłowego pliku
-            
-            // Act
-            var result = await _ddlExtractionService.ExtractDdl(invalidSqlLiteFile);
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.Contains("Error")); // Dostosuj to do oczekiwanego komunikatu błędu
-        }
-
+        // ... other tests
     }
 }

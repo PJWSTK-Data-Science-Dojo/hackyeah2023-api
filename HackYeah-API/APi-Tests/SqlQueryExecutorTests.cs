@@ -1,58 +1,55 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using HackYeah_API.Services;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Data.Sqlite;
-using NUnit.Framework;
+using Microsoft.Extensions.Options;
 
+namespace APi_Tests;
+
+[TestFixture]
+public class SqlQueryExecutorTests
 {
-    [TestFixture]
-    public class SqlQueryExecutorTests
+    private SqlQueryExecutor _sqlQueryExecutor;
+    private IConfiguration _configuration;
+
+    [SetUp]
+    public void Setup()
     {
-        private SqlQueryExecutor _sqlQueryExecutor;
-        private IConfiguration _configuration;
+        var config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
 
-        [SetUp]
-        public void Setup()
-        {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
+        _configuration = Options.Create(config).Value;
+        _sqlQueryExecutor = new SqlQueryExecutor(_configuration);
+    }
 
-            _configuration = Options.Create(config).Value;
-            _sqlQueryExecutor = new SqlQueryExecutor(_configuration);
-        }
+    [Test]
+    public async Task ExecuteQueryAsync_WithValidQuery_ShouldReturnData()
+    {
+        // Arrange
+        var validSqlQuery = "SELECT * FROM TableName"; // Zastąp 'TableName' prawidłową nazwą tabeli
 
-        [Test]
-        public async Task ExecuteQueryAsync_WithValidQuery_ShouldReturnData()
-        {
-            // Arrange
-            var validSqlQuery = "SELECT * FROM TableName"; // Zastąp 'TableName' prawidłową nazwą tabeli
-            
-            // Act
-            var (result, errorMessage) = await _sqlQueryExecutor.ExecuteQueryAsync(validSqlQuery);
+        // Act
+        var (result, errorMessage) = await _sqlQueryExecutor.ExecuteQueryAsync(validSqlQuery);
 
-            // Assert
-            Assert.IsNull(errorMessage);
-            Assert.IsNotNull(result);
-            Assert.IsNotEmpty(result);
-        }
+        // Assert
+        Assert.IsNull(errorMessage);
+        Assert.IsNotNull(result);
+        Assert.IsNotEmpty(result);
+    }
 
-        [Test]
-        public async Task ExecuteQueryAsync_WithInvalidQuery_ShouldReturnErrorMessage()
-        {
-            // Arrange
-            var invalidSqlQuery = "SELECT * FROM NonExistentTable"; // Zastąp 'NonExistentTable' nieistniejącą tabelą
-            
-            // Act
-            var (result, errorMessage) = await _sqlQueryExecutor.ExecuteQueryAsync(invalidSqlQuery);
+    [Test]
+    public async Task ExecuteQueryAsync_WithInvalidQuery_ShouldReturnErrorMessage()
+    {
+        // Arrange
+        var invalidSqlQuery = "SELECT * FROM NonExistentTable"; // Zastąp 'NonExistentTable' nieistniejącą tabelą
 
-            // Assert
-            Assert.IsNotNull(errorMessage);
-            Assert.IsNull(result);
-           
-        }
+        // Act
+        var (result, errorMessage) = await _sqlQueryExecutor.ExecuteQueryAsync(invalidSqlQuery);
+
+        // Assert
+        Assert.IsNotNull(errorMessage);
+        Assert.IsNull(result);
 
     }
+
 }
