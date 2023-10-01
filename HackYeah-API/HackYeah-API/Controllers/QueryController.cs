@@ -20,7 +20,7 @@ public class QueryController : ControllerBase
     [HttpPost("/prompt")]
     public async Task<IActionResult> PromptForSqlQuery([FromBody] UserNlpInputDto userNlpInput)
     {
-        var sqlQuery = await _mlService.RequestForSQLPrompt(userNlpInput.NaturalLanguageInput);
+        var sqlQuery = await _mlService.RequestForSQLPrompt(userNlpInput);
         return Ok(new {sql = sqlQuery});
     }
 

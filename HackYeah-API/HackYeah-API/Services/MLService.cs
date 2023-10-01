@@ -11,6 +11,7 @@ public class MLService : IMLService
     private readonly IHttpClientFactory _httpClientFactory;
     private const string _ddlEndpoint = "/chat";
     private const string _queryEndpoint = "/context";
+    private const string _premiumQueryEndpoint = "/premium";
     private readonly string _contextGuid = Guid.NewGuid().ToString();
     public MLService(IConfiguration config, IHttpClientFactory httpClientFactory)
     {
@@ -33,7 +34,7 @@ public class MLService : IMLService
         var response = await client.PostAsync($"{APIUrl}{_ddlEndpoint}", jsonContent);
     }
 
-    public async Task<string> RequestForSQLPrompt(string naturalLanguagePrompt)
+    public async Task<string> RequestForSQLPrompt(UserNlpInputDto naturalLanguagePrompt)
     {
         var client = _httpClientFactory.CreateClient();
 
@@ -44,8 +45,8 @@ public class MLService : IMLService
         };
 
         var jsonContent = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-
-        var request = await client.PostAsync($"{APIUrl}{_queryEndpoint}", jsonContent);
+        string endpoint = naturalLanguagePrompt.IsPremiumModel ? _premiumQueryEndpoint : _queryEndpoint;
+        var request = await client.PostAsync($"{APIUrl}{endpoint}", jsonContent);
         var response = await request.Content.ReadFromJsonAsync<MLApiResponse>();
         return response?.Output ?? "ERROR";
     }

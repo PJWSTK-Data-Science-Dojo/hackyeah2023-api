@@ -3,4 +3,5 @@
 public class UserNlpInputDto
 {
     public string NaturalLanguageInput { get; set; }
+    public bool IsPremiumModel { get; set; }
 }
