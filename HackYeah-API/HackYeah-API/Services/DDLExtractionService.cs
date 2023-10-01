@@ -42,7 +42,8 @@ public class DdlExtractionService : IDdlExtractionService
                 if(kvp.Value.ToString().IsNullOrEmpty())
                     continue;
 
-                stringBuilder.Append($"{kvp.Key}: {kvp.Value}\n");
+                stringBuilder.Append($"{kvp.Key}: [{string.Join(", ", kvp.Value)}]\n");
+
             }
             stringBuilder.Append("\n"); 
         }
