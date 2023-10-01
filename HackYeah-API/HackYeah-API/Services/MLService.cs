@@ -26,7 +26,7 @@ public class MLService : IMLService
 
         var payload = new
         {
-            structure = ddl
+            context = ddl
         };
 
         var jsonContent = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
